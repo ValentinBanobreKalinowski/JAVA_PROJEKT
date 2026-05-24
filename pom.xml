@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.example</groupId>
-    <artifactId>VotingSytsem</artifactId>
+    <artifactId>VotingSystem</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>VotingSytsem</name>
     <description>VotingSytsem</description>
