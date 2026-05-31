@@ -1,19 +1,40 @@
 package org.example.votingsytsem.user;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+import java.util.List;
+
+@RestController
+@RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
+
     private final UserService userService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
+    @GetMapping
+    public List<User> getUsers() {
+        return userService.getUsers();
     }
 
-    @GetMapping("/welcome")
-    public String welcome() {
-        return "welcome";
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable Long id) {
+        return userService.findById(id);
+    }
+
+    @PostMapping
+    public String registerUser(User newUser) {
+        userService.addUser(newUser);
+        return "userdashboard.html";
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+    }
+
+    @PutMapping("/{id}")
+    public User modifyUser(@PathVariable Long id, @RequestBody User newUserInfo) {
+        return userService.modifyUser(id, newUserInfo);
     }
 }

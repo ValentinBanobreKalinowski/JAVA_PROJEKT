@@ -5,6 +5,25 @@
 
 <body>
 <h1>Witaj w systemie logowania!</h1>
+<h2>Rejestracja:</h2>
+<form action="/users" method="POST">
+    <label for="name">Imie:</label><br>
+    <input type="text" id="name" name="name" required><br><br>
+
+    <label for="surname">Nazwisko:</label><br>
+    <input type="text" id="surname" name="surname" required><br><br>
+
+    <label for="password">Data urodzenia:</label><br>
+    <input type="password" id="password" name="password" required><br><br>
+
+    <label for="dateOfBirth">Data urodzenia:</label><br>
+    <input type="date" id="dateOfBirth" name="dateOfBirth" required><br><br>
+
+    <label for="pesel">PESEL:</label><br>
+    <input type="number" id="pesel" name="pesel" required><br><br>
+
+    <button type="submit">Zarejestruj</button>
+</form>
 </body>
 
 </html>
