@@ -22,12 +22,6 @@ public class UserController {
         return userService.findById(id);
     }
 
-    @PostMapping
-    public String registerUser(User newUser) {
-        userService.addUser(newUser);
-        return "userdashboard.html";
-    }
-
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
