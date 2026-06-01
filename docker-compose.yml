@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  oracle-db:
+    image: gvenzl/oracle-xe:21-slim-faststart
+    container_name: oracle-db
+    ports:
+      - "1521:1521"
+    environment:
+      - ORACLE_PASSWORD=TwojeSilneHaslo123
+      - APP_USER=projekt_user
+      - APP_USER_PASSWORD=ProjektHaslo123
