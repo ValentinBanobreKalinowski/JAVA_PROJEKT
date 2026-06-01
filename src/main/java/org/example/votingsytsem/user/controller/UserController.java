@@ -1,8 +1,9 @@
-package org.example.votingsytsem.user;
+package org.example.votingsytsem.user.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.votingsytsem.user.model.User;
+import org.example.votingsytsem.user.services.UserService;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController

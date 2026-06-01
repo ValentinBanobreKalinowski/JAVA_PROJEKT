@@ -1,4 +1,4 @@
-package org.example.votingsytsem.user;
+package org.example.votingsytsem.user.model;
 
 import jakarta.persistence.*;
 import lombok.*;

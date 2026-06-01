@@ -1,6 +1,6 @@
-package org.example.votingsytsem.user;
+package org.example.votingsytsem.user.repository;
 
-import jdk.jfr.Registered;
+import org.example.votingsytsem.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
