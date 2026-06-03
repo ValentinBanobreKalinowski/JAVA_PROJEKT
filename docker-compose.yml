@@ -1,12 +1,26 @@
-version: '3.8'
 
 services:
-  oracle-db:
-    image: gvenzl/oracle-xe:21-slim-faststart
-    container_name: oracle-db
-    ports:
-      - "1521:1521"
+
+  db:
+    image: postgres:16-alpine
+    restart: always
+    shm_size: 128mb
+
     environment:
-      - ORACLE_PASSWORD=TwojeSilneHaslo123
-      - APP_USER=projekt_user
-      - APP_USER_PASSWORD=ProjektHaslo123
+      POSTGRES_USER: projektjava
+      POSTGRES_PASSWORD: haslohaslo123
+      POSTGRES_DB: projektjava_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+
+
+volumes:
+  postgres_data:
