@@ -1,10 +1,10 @@
-package org.example.votingsytsem;
+package org.example.votingsystem;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class VotingSytsemApplicationTests {
+class VotingSystemApplicationTests {
 
     @Test
     void contextLoads() {

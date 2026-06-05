@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - Voting System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-success {
+            background-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-upcoming {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status-ended {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Admin Dashboard</h1>
+            <div>
+                <a href="/logout" class="btn btn-secondary">Logout</a>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <a href="/admin/create-vote" class="btn btn-success">Create New Vote</a>
+        </div>
+
+        <h2>All Votes</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="voting : ${votings}">
+                    <td th:text="${voting.id}"></td>
+                    <td th:text="${voting.title}"></td>
+                    <td th:text="${#temporals.format(voting.startTime, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td th:text="${#temporals.format(voting.endTime, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td>
+                        <span th:if="${voting.status == 'ACTIVE'}" class="status status-active">Active</span>
+                        <span th:if="${voting.status == 'UPCOMING'}" class="status status-upcoming">Upcoming</span>
+                        <span th:if="${voting.status == 'ENDED'}" class="status status-ended">Ended</span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a th:href="@{/admin/vote-results/{id}(id=${voting.id})}" class="btn">View Results</a>
+                            <form th:if="${voting.status == 'ACTIVE'}" th:action="@{/admin/finish-vote/{id}(id=${voting.id})}" method="post" style="display: inline;">
+                                <button type="submit" class="btn btn-danger">Finish Vote</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

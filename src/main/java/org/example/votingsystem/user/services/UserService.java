@@ -1,8 +1,8 @@
-package org.example.votingsytsem.user.services;
+package org.example.votingsystem.user.services;
 
 import lombok.RequiredArgsConstructor;
-import org.example.votingsytsem.user.repository.UserRepository;
-import org.example.votingsytsem.user.model.User;
+import org.example.votingsystem.user.repository.UserRepository;
+import org.example.votingsystem.user.model.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

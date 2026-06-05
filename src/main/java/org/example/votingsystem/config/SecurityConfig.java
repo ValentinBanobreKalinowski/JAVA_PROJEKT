@@ -1,4 +1,4 @@
-package org.example.votingsytsem.config;
+package org.example.votingsystem.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,16 +21,30 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/users/dashboard").hasRole("USER")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/login", "/users/login").permitAll()
-                        .anyRequest().permitAll()
+                        .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/users/dashboard").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/login", "/register", "/register-admin").permitAll()
+                        .requestMatchers("/users", "/users/login").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/users/validate")
-                        .defaultSuccessUrl("/users/dashboard")
+                        .successHandler((request, response, authentication) -> {
+                            if (authentication.getAuthorities().stream()
+                                    .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+                                response.sendRedirect("/admin/dashboard");
+                            } else {
+                                response.sendRedirect("/user/votes");
+                            }
+                        })
                         .failureUrl("/login?error=true")
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout=true")
                         .permitAll()
                 );
 

@@ -1,7 +1,7 @@
-package org.example.votingsytsem.user.services;
+package org.example.votingsystem.user.services;
 
 import lombok.RequiredArgsConstructor;
-import org.example.votingsytsem.user.repository.UserRepository;
+import org.example.votingsystem.user.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

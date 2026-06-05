@@ -1,0 +1,95 @@
+package org.example.votingsystem.voting.services;
+
+import org.example.votingsystem.voting.model.*;
+import org.example.votingsystem.voting.repository.*;
+import org.example.votingsystem.user.model.User;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Service
+public class VotingService {
+
+    private final VotingRepository votingRepository;
+    private final VoteRepository voteRepository;
+
+    public VotingService(VotingRepository votingRepository, VoteRepository voteRepository) {
+        this.votingRepository = votingRepository;
+        this.voteRepository = voteRepository;
+    }
+
+    @Transactional
+    public Vote castVote(User user, Long votingId, String chosenOption) {
+        Voting voting = votingRepository.findById(votingId)
+                .orElseThrow(() -> new IllegalArgumentException("Voting process not found."));
+
+        LocalDateTime now = LocalDateTime.now();
+
+        if (now.isBefore(voting.getStartTime()) || now.isAfter(voting.getEndTime())) {
+            throw new IllegalStateException("This voting is not active.");
+        }
+
+        if (voteRepository.existsByUserIdAndVotingId(user.getId(), votingId)) {
+            throw new IllegalStateException("You have already cast your vote in this election.");
+        }
+
+        Vote vote = new Vote();
+        vote.setUser(user);
+        vote.setVoting(voting);
+        vote.setChosenOption(chosenOption);
+        vote.setVoteWeight(user.getVoteWeight());
+        vote.setCastAt(now);
+
+        return voteRepository.save(vote);
+    }
+
+    public Map<String, Integer> calculateResults(Long votingId) {
+        return voteRepository.findByVotingId(votingId).stream()
+                .collect(Collectors.groupingBy(
+                        Vote::getChosenOption,
+                        Collectors.summingInt(Vote::getVoteWeight)
+                ));
+    }
+
+    public List<Voting> getAllVotings() {
+        return votingRepository.findAll();
+    }
+
+    public List<Voting> getActiveVotings() {
+        LocalDateTime now = LocalDateTime.now();
+        return votingRepository.findAll().stream()
+                .filter(v -> now.isAfter(v.getStartTime()) && now.isBefore(v.getEndTime()))
+                .collect(Collectors.toList());
+    }
+
+    public Voting getVotingById(Long id) {
+        return votingRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Voting not found with id: " + id));
+    }
+
+    @Transactional
+    public Voting createVoting(Voting voting) {
+        return votingRepository.save(voting);
+    }
+
+    @Transactional
+    public void finishVote(Long votingId) {
+        Voting voting = getVotingById(votingId);
+        voting.setEndTime(LocalDateTime.now());
+        votingRepository.save(voting);
+    }
+
+    public boolean hasUserVoted(Long userId, Long votingId) {
+        return voteRepository.existsByUserIdAndVotingId(userId, votingId);
+    }
+
+    public List<Voting> getEndedVotings() {
+        LocalDateTime now = LocalDateTime.now();
+        return votingRepository.findAll().stream()
+                .filter(v -> now.isAfter(v.getEndTime()))
+                .collect(Collectors.toList());
+    }
+}
