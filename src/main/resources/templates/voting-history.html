@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Voting History - Voting System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .nav-links a {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .nav-links a:hover {
+            background-color: #0056b3;
+        }
+        .nav-links a.active {
+            background-color: #0056b3;
+        }
+        .vote-card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        .vote-card h3 {
+            margin-top: 0;
+            color: #6c757d;
+        }
+        .vote-info {
+            margin: 10px 0;
+            color: #666;
+            font-size: 14px;
+        }
+        .vote-actions {
+            margin-top: 15px;
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .voted-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            background-color: #d4edda;
+            color: #155724;
+            margin-left: 10px;
+        }
+        .no-votes {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Voting History</h1>
+            <a href="/logout" class="btn btn-secondary">Logout</a>
+        </div>
+
+        <div class="nav-links">
+            <a href="/user/votes">Active Votes</a>
+            <a href="/user/history" class="active">History</a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(votings)}" class="no-votes">
+            <h2>No completed votes yet</h2>
+            <p>Check back later to see results of finished votes</p>
+        </div>
+
+        <div th:each="voting : ${votings}" class="vote-card">
+            <h3 th:text="${voting.title}"></h3>
+            <span class="status-badge">Ended</span>
+            <span th:if="${voting.hasVoted}" class="voted-badge">You voted</span>
+            <p th:text="${voting.description}"></p>
+            <div class="vote-info">
+                <strong>Started:</strong> <span th:text="${#temporals.format(voting.startTime, 'yyyy-MM-dd HH:mm')}"></span><br>
+                <strong>Ended:</strong> <span th:text="${#temporals.format(voting.endTime, 'yyyy-MM-dd HH:mm')}"></span><br>
+                <strong>Type:</strong> <span th:text="${voting.type}"></span>
+            </div>
+            <div class="vote-actions">
+                <a th:href="@{/user/results/{id}(id=${voting.id})}" class="btn">View Results</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

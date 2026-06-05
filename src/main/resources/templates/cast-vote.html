@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cast Vote - Voting System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .description {
+            color: #666;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #007bff;
+        }
+        .vote-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .options-container {
+            margin: 20px 0;
+        }
+        .option-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .option-item:hover {
+            background-color: #f8f9fa;
+            border-color: #007bff;
+        }
+        .option-item input[type="radio"],
+        .option-item input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        .option-item label {
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .btn {
+            padding: 12px 30px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        .btn:hover {
+            background-color: #218838;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .button-group {
+            margin-top: 30px;
+        }
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .alert-warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 th:text="${voting.title}"></h1>
+        <p class="description" th:text="${voting.description}"></p>
+
+        <div class="vote-info">
+            <strong>Voting Period:</strong><br>
+            From: <span th:text="${#temporals.format(voting.startTime, 'yyyy-MM-dd HH:mm')}"></span><br>
+            To: <span th:text="${#temporals.format(voting.endTime, 'yyyy-MM-dd HH:mm')}"></span>
+        </div>
+
+        <div th:if="${error}" class="alert alert-warning" th:text="${error}"></div>
+
+        <form th:action="@{/user/vote/{id}(id=${voting.id})}" method="POST">
+            <h3>Select your choice:</h3>
+            <div class="options-container">
+                <div th:each="option, iterStat : ${voting.options}" class="option-item">
+                    <input th:if="${voting.type.toString() == 'SINGLE_CHOICE'}" 
+                           type="radio" 
+                           th:id="'option' + ${iterStat.index}" 
+                           name="chosenOption" 
+                           th:value="${option}" 
+                           required>
+                    <input th:if="${voting.type.toString() == 'MULTIPLE_CHOICE'}" 
+                           type="checkbox" 
+                           th:id="'option' + ${iterStat.index}" 
+                           name="chosenOptions" 
+                           th:value="${option}">
+                    <label th:for="'option' + ${iterStat.index}" th:text="${option}"></label>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn">Submit Vote</button>
+                <a href="/user/votes" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

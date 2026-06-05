@@ -1,15 +1,17 @@
-package org.example.votingsytsem.user.controller;
+package org.example.votingsystem.user.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.votingsytsem.user.model.User;
-import org.example.votingsytsem.user.services.UserService;
+import org.example.votingsystem.user.model.User;
+import org.example.votingsystem.user.services.UserService;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
-public class UserController {
+public class
+
+UserController {
 
     private final UserService userService;
 

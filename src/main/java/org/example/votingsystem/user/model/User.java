@@ -1,4 +1,4 @@
-package org.example.votingsytsem.user.model;
+package org.example.votingsystem.user.model;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -64,4 +64,9 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() { return true; }
+
+    public Integer getVoteWeight() {
+        // Default vote weight is 1, can be customized based on user attributes
+        return 1;
+    }
 }
