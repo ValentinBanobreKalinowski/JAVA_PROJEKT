@@ -4,8 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.example.votingsystem.user.model.User;
 import org.example.votingsystem.user.services.UserService;
 import org.springframework.stereotype.Controller;
+    import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import jakarta.validation.Valid;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 
 @Controller
@@ -15,7 +19,8 @@ public class UserLoginController {
     private final UserService userService;
 
     @GetMapping("/register")
-    public String registration() {
+    public String registration(Model model) {
+        model.addAttribute("user", new User());
         return "welcome";
     }
 
@@ -25,7 +30,8 @@ public class UserLoginController {
     }
 
     @PostMapping("/users")
-    public String registerUser(User newUser) {
+    public String registerUser(@Valid User newUser, BindingResult bindingResult) {
+        if(bindingResult.hasErrors()) return "welcome";
         userService.addUser(newUser);
         return "redirect:/login";
     }
@@ -36,7 +42,8 @@ public class UserLoginController {
     }
 
     @PostMapping("/register-admin")
-    public String registerAdmin(User newUser) {
+    public String registerAdmin(@Valid User newUser, BindingResult bindingResult) {
+        if(bindingResult.hasErrors()) return "register-admin";
         newUser.setRole("ROLE_ADMIN");
         userService.addUser(newUser);
         return "redirect:/login";

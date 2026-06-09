@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
@@ -22,11 +23,22 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq_gen")
     @SequenceGenerator(name = "user_seq_gen", sequenceName = "users_seq", allocationSize = 1)
     private Long id;
+
+    @NotBlank(message = "Imię jest wymagane")
     private String name;
+    @NotBlank(message = "Nazwisko jest wymagane")
     private String surname;
+    //@NotBlank(message = "Email jest wymagany")
+    //@Email(message = "Podano niepoprawny format adresu email")
+    //private String email;
+    @NotBlank(message = "Hasło jest wymagane")
+    @Size(min=8, message = "hasło musi mieć co najmniej 8 znaków")
     private String password;
+    @Past(message = "data urodzenia musi być w przeszłości")
+    @NotNull(message = "data urodzenia jest wymagana")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate dateOfBirth;
+    @NotNull(message = "PESEL jest wymagany")
     @Column(unique = true, nullable = false)
     private Long pesel;
     private String role = "ROLE_USER";
