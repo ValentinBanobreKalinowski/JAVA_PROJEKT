@@ -1,5 +1,6 @@
 package org.example.votingsystem.user.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.example.votingsystem.user.model.User;
 import org.example.votingsystem.user.services.UserService;
@@ -31,7 +32,7 @@ UserController {
     }
 
     @PutMapping("/{id}")
-    public User modifyUser(@PathVariable Long id, @RequestBody User newUserInfo) {
+    public User modifyUser(@PathVariable Long id, @Valid @RequestBody User newUserInfo) {
         return userService.modifyUser(id, newUserInfo);
     }
 }

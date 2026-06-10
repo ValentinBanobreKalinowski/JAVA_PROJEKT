@@ -30,19 +30,32 @@ public class UserLoginController {
     }
 
     @PostMapping("/users")
-    public String registerUser(@Valid User newUser, BindingResult bindingResult) {
+    public String registerUser(@Valid @ModelAttribute("user") User newUser, BindingResult bindingResult) {
+        if (userService.existsByEmail(newUser.getEmail())) {
+            bindingResult.rejectValue("email", "error.user", "Ten email jest już zajęty");
+        }
+        if (userService.existsByPesel(newUser.getPesel())) {
+            bindingResult.rejectValue("pesel", "error.user", "Ten PESEL jest już zarejestrowany");
+        }
         if(bindingResult.hasErrors()) return "welcome";
         userService.addUser(newUser);
         return "redirect:/login";
     }
 
     @GetMapping("/register-admin")
-    public String adminRegistration() {
+    public String adminRegistration(Model model) {
+        model.addAttribute("user", new User());
         return "register-admin";
     }
 
     @PostMapping("/register-admin")
-    public String registerAdmin(@Valid User newUser, BindingResult bindingResult) {
+    public String registerAdmin(@Valid @ModelAttribute("user") User newUser, BindingResult bindingResult) {
+        if (userService.existsByEmail(newUser.getEmail())) {
+            bindingResult.rejectValue("email", "error.user", "Ten email jest już zajęty");
+        }
+        if (userService.existsByPesel(newUser.getPesel())) {
+            bindingResult.rejectValue("pesel", "error.user", "Ten PESEL jest już zarejestrowany");
+        }
         if(bindingResult.hasErrors()) return "register-admin";
         newUser.setRole("ROLE_ADMIN");
         userService.addUser(newUser);

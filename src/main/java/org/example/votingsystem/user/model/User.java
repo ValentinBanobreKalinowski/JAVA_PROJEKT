@@ -28,9 +28,10 @@ public class User implements UserDetails {
     private String name;
     @NotBlank(message = "Nazwisko jest wymagane")
     private String surname;
-    //@NotBlank(message = "Email jest wymagany")
-    //@Email(message = "Podano niepoprawny format adresu email")
-    //private String email;
+    @NotBlank(message = "Email jest wymagany")
+    @Email(message = "Podano niepoprawny format adresu email")
+    @Column(unique = true)
+    private String email;
     @NotBlank(message = "Hasło jest wymagane")
     @Size(min=8, message = "hasło musi mieć co najmniej 8 znaków")
     private String password;
@@ -47,6 +48,7 @@ public class User implements UserDetails {
         this.setId(newUserInfo.getId());
         this.setName(newUserInfo.getName());
         this.setSurname(newUserInfo.getSurname());
+        this.setEmail(newUserInfo.getEmail());
         this.setDateOfBirth(newUserInfo.getDateOfBirth());
         this.setPesel(newUserInfo.getPesel());
         return this;

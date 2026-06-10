@@ -30,10 +30,28 @@ public class UserService {
 
     public User modifyUser(Long id, User newUserInfo) {
         User user = findById(id);
-        return user.modify(newUserInfo);
+
+        if (!user.getEmail().equals(newUserInfo.getEmail()) && userRepository.existsByEmail(newUserInfo.getEmail())) {
+            throw new IllegalArgumentException("Ten e-mail jest już zajęty przez innego użytkownika!");
+        }
+
+        if (!user.getPesel().equals(newUserInfo.getPesel()) && userRepository.existsByPesel(newUserInfo.getPesel())) {
+            throw new IllegalArgumentException("Ten PESEL należy już do kogoś innego!");
+        }
+        User updatedUser = user.modify(newUserInfo);
+        return userRepository.save(updatedUser);
     }
 
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    public boolean existsByPesel(Long pesel) {
+        return userRepository.existsByPesel(pesel);
+    }
 }
+
