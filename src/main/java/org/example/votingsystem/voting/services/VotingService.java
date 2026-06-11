@@ -24,16 +24,16 @@ public class VotingService {
     @Transactional
     public Vote castVote(User user, Long votingId, String chosenOption) {
         Voting voting = votingRepository.findById(votingId)
-                .orElseThrow(() -> new IllegalArgumentException("Voting process not found."));
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono procesu głosowania."));
 
         LocalDateTime now = LocalDateTime.now();
 
         if (now.isBefore(voting.getStartTime()) || now.isAfter(voting.getEndTime())) {
-            throw new IllegalStateException("This voting is not active.");
+            throw new IllegalStateException("To głosowanie nie jest aktywne.");
         }
 
         if (voteRepository.existsByUserIdAndVotingId(user.getId(), votingId)) {
-            throw new IllegalStateException("You have already cast your vote in this election.");
+            throw new IllegalStateException("Już oddałeś swój głos w tym głosowaniu.");
         }
 
         Vote vote = new Vote();
@@ -67,7 +67,7 @@ public class VotingService {
 
     public Voting getVotingById(Long id) {
         return votingRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Voting not found with id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono głosowania o id: " + id));
     }
 
     @Transactional
@@ -91,5 +91,29 @@ public class VotingService {
         return votingRepository.findAll().stream()
                 .filter(v -> now.isAfter(v.getEndTime()))
                 .collect(Collectors.toList());
+    }
+
+    public boolean canEditVoting(Long votingId) {
+        Voting voting = getVotingById(votingId);
+        LocalDateTime now = LocalDateTime.now();
+        return now.isBefore(voting.getStartTime());
+    }
+
+    @Transactional
+    public Voting updateVoting(Long votingId, Voting updatedVoting) {
+        Voting voting = getVotingById(votingId);
+
+        if (!canEditVoting(votingId)) {
+            throw new IllegalStateException("Nie można edytować głosowania, które już się rozpoczęło lub zakończyło.");
+        }
+
+        voting.setTitle(updatedVoting.getTitle());
+        voting.setDescription(updatedVoting.getDescription());
+        voting.setStartTime(updatedVoting.getStartTime());
+        voting.setEndTime(updatedVoting.getEndTime());
+        voting.setType(updatedVoting.getType());
+        voting.setOptions(updatedVoting.getOptions());
+
+        return votingRepository.save(voting);
     }
 }

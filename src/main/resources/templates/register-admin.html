@@ -62,20 +62,20 @@
 </head>
 <body>
     <div class="container">
-        <h2>Admin Registration</h2>
+        <h2>Rejestracja Administartora</h2>
         
         <div class="warning">
-            WARNING: This page should be removed in production!
+            Usunąć stronke na produkcji
         </div>
 
         <form action="/register-admin" method="POST">
             <div class="form-group">
-                <label for="name">Name:</label>
+                <label for="name">Imie:</label>
                 <input type="text" id="name" name="name" required>
             </div>
 
             <div class="form-group">
-                <label for="surname">Surname:</label>
+                <label for="surname">Nazwisko:</label>
                 <input type="text" id="surname" name="surname" required>
             </div>
 
@@ -85,20 +85,20 @@
             </div>
 
             <div class="form-group">
-                <label for="dateOfBirth">Date of Birth:</label>
+                <label for="dateOfBirth">Data Urodzenia:</label>
                 <input type="date" id="dateOfBirth" name="dateOfBirth" required>
             </div>
 
             <div class="form-group">
-                <label for="password">Password:</label>
+                <label for="password">Hasło:</label>
                 <input type="password" id="password" name="password" required>
             </div>
 
-            <button type="submit">Register as Admin</button>
+            <button type="submit">Zarejestruj Administratora</button>
         </form>
 
         <p style="text-align: center; margin-top: 20px;">
-            <a href="/login">Back to Login</a>
+            <a href="/login">Wróc do logowania</a>
         </p>
     </div>
 </body>

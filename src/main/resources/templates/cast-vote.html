@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Cast Vote - Voting System</title>
+    <title>Oddaj Głos - System Głosowania</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -98,15 +98,15 @@
         <p class="description" th:text="${voting.description}"></p>
 
         <div class="vote-info">
-            <strong>Voting Period:</strong><br>
-            From: <span th:text="${#temporals.format(voting.startTime, 'yyyy-MM-dd HH:mm')}"></span><br>
-            To: <span th:text="${#temporals.format(voting.endTime, 'yyyy-MM-dd HH:mm')}"></span>
+            <strong>Okres głosowania:</strong><br>
+            Od: <span th:text="${#temporals.format(voting.startTime, 'yyyy-MM-dd HH:mm')}"></span><br>
+            Do: <span th:text="${#temporals.format(voting.endTime, 'yyyy-MM-dd HH:mm')}"></span>
         </div>
 
         <div th:if="${error}" class="alert alert-warning" th:text="${error}"></div>
 
         <form th:action="@{/user/vote/{id}(id=${voting.id})}" method="POST">
-            <h3>Select your choice:</h3>
+            <h3>Wybierz swoją opcję:</h3>
             <div class="options-container">
                 <div th:each="option, iterStat : ${voting.options}" class="option-item">
                     <input th:if="${voting.type.toString() == 'SINGLE_CHOICE'}" 
@@ -125,8 +125,8 @@
             </div>
 
             <div class="button-group">
-                <button type="submit" class="btn">Submit Vote</button>
-                <a href="/user/votes" class="btn btn-secondary">Cancel</a>
+                <button type="submit" class="btn">Oddaj Głos</button>
+                <a href="/user/votes" class="btn btn-secondary">Anuluj</a>
             </div>
         </form>
     </div>
