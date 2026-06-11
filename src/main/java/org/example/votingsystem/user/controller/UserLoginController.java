@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import jakarta.validation.Valid;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
 
 
 @Controller
@@ -21,7 +20,7 @@ public class UserLoginController {
     @GetMapping("/register")
     public String registration(Model model) {
         model.addAttribute("user", new User());
-        return "welcome";
+        return "register-user";
     }
 
     @GetMapping("/users/dashboard")
@@ -31,7 +30,7 @@ public class UserLoginController {
 
     @PostMapping("/users")
     public String registerUser(@Valid User newUser, BindingResult bindingResult) {
-        if(bindingResult.hasErrors()) return "welcome";
+        if(bindingResult.hasErrors()) return "register-user";
         userService.addUser(newUser);
         return "redirect:/login";
     }
