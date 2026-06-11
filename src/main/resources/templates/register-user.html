@@ -113,23 +113,35 @@
                 <span th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}" class="error"></span>
             </div>
 
-            <div class="form-group">
-                <label for="password">Hasło:</label>
-                <input type="password" id="password" th:field="*{password}" placeholder="Wprowadź hasło">
-                <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error"></span>
-            </div>
+        <div class="form-group">
+            <label for="pesel">PESEL:</label>
+            <input type="text" id="pesel" th:field="*{pesel}" maxlength="11" placeholder="Wprowadź numer PESEL">
+            <span th:if="${#fields.hasErrors('pesel')}" th:errors="*{pesel}" class="error"></span>
+        </div>
 
-            <div class="form-group">
-                <label for="dateOfBirth">Data urodzenia:</label>
-                <input type="date" id="dateOfBirth" th:field="*{dateOfBirth}">
-                <span th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}" class="error"></span>
-            </div>
+        <div class="form-group">
+            <label for="dateOfBirth">Data urodzenia:</label>
+            <input type="date" id="dateOfBirth" th:field="*{dateOfBirth}">
+            <span th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}" class="error"></span>
+        </div>
 
-            <div class="form-group">
-                <label for="pesel">PESEL:</label>
-                <input type="number" id="pesel" th:field="*{pesel}" placeholder="Wprowadź numer PESEL">
-                <span th:if="${#fields.hasErrors('pesel')}" th:errors="*{pesel}" class="error"></span>
-            </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" th:field="*{email}">
+            <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Hasło:</label>
+            <input type="password" id="password" th:field="*{password}">
+            <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="confirmPassword">Powtórz hasło:</label>
+            <input type="password" id="confirmPassword" th:field="*{confirmPassword}">
+            <span th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="error"></span>
+        </div>
 
             <button type="submit" class="btn">Zarejestruj</button>
         </form>
