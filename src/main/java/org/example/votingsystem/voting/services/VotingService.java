@@ -32,6 +32,10 @@ public class VotingService {
             throw new IllegalStateException("To głosowanie nie jest aktywne.");
         }
 
+        if (!voting.getOptions().contains(chosenOption)) {
+            throw new IllegalArgumentException("Wybrana opcja nie istnieje w tym głosowaniu.");
+        }
+
         if (voteRepository.existsByUserIdAndVotingId(user.getId(), votingId)) {
             throw new IllegalStateException("Już oddałeś swój głos w tym głosowaniu.");
         }
@@ -72,6 +76,10 @@ public class VotingService {
 
     @Transactional
     public Voting createVoting(Voting voting) {
+        if (voting.getEndTime().isBefore(voting.getStartTime()) || voting.getEndTime().isEqual(voting.getStartTime())) {
+            throw new IllegalArgumentException("Data zakończenia musi być późniejsza niż data rozpoczęcia.");
+        }
+
         return votingRepository.save(voting);
     }
 

@@ -1,5 +1,7 @@
 package org.example.votingsystem.voting.controller;
 
+import jakarta.validation.Valid;
+import org.example.votingsystem.voting.dto.VotingCreateDto;
 import org.example.votingsystem.voting.model.*;
 import org.example.votingsystem.voting.services.VotingService;
 import org.example.votingsystem.user.model.User;
@@ -7,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -33,31 +36,47 @@ public class VotingController {
 
     @GetMapping("/admin/create-vote")
     @PreAuthorize("hasRole('ADMIN')")
-    public String createVoteForm() {
+    public String createVoteForm(Model model) {
+        model.addAttribute("votingForm", new VotingCreateDto());
         return "create-vote";
     }
 
     @PostMapping("/admin/create-vote")
     @PreAuthorize("hasRole('ADMIN')")
-    public String createVote(@RequestParam String title,
-                           @RequestParam(required = false) String description,
-                           @RequestParam String startTime,
-                           @RequestParam String endTime,
-                           @RequestParam VotingType type,
-                           @RequestParam("options[]") List<String> options,
-                           RedirectAttributes redirectAttributes) {
+    public String createVote(@Valid @ModelAttribute("votingForm") VotingCreateDto dto,
+                             BindingResult bindingResult,
+                             Model model,
+                             RedirectAttributes redirectAttributes) {
+
+        if (bindingResult.hasErrors()) {
+            return "create-vote";
+        }
+
+        List<String> filteredOptions = dto.getOptions().stream()
+                .filter(opt -> opt != null && !opt.trim().isEmpty())
+                .toList();
+
+        if (filteredOptions.size() < 2) {
+            bindingResult.rejectValue("options", "error.options", "Musisz podać co najmniej 2 niepuste opcje.");
+            return "create-vote";
+        }
 
         Voting voting = new Voting();
-        voting.setTitle(title);
-        voting.setDescription(description);
-        voting.setStartTime(LocalDateTime.parse(startTime));
-        voting.setEndTime(LocalDateTime.parse(endTime));
-        voting.setType(type);
-        voting.setOptions(options);
+        voting.setTitle(dto.getTitle());
+        voting.setDescription(dto.getDescription());
+        voting.setStartTime(dto.getStartTime());
+        voting.setEndTime(dto.getEndTime());
+        voting.setType(dto.getType());
+        voting.setOptions(filteredOptions);
 
-        votingService.createVoting(voting);
-        redirectAttributes.addFlashAttribute("success", "Głosowanie utworzone pomyślnie!");
-        return "redirect:/admin/dashboard";
+        try {
+            votingService.createVoting(voting);
+            redirectAttributes.addFlashAttribute("success", "Głosowanie utworzone pomyślnie!!");
+            return "redirect:/admin/dashboard";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("businessError", e.getMessage());
+            return "create-vote";
+        }
     }
 
     @PostMapping("/admin/finish-vote/{id}")
@@ -111,13 +130,21 @@ public class VotingController {
     @PostMapping("/user/vote/{id}")
     @PreAuthorize("hasRole('USER')")
     public String castVote(@PathVariable Long id,
-                          @RequestParam(required = false) String chosenOption,
-                          @RequestParam(required = false) List<String> chosenOptions,
-                          @AuthenticationPrincipal User user,
-                          RedirectAttributes redirectAttributes) {
+                           @RequestParam(required = false) String chosenOption,
+                           @RequestParam(required = false) List<String> chosenOptions,
+                           @AuthenticationPrincipal User user,
+                           RedirectAttributes redirectAttributes) {
         try {
-            String option = chosenOption != null ? chosenOption : String.join(",", chosenOptions);
+            String option = chosenOption != null ? chosenOption : (chosenOptions != null ? String.join(",", chosenOptions) : null);
+
+            if (option == null || option.trim().isEmpty()) {
+                redirectAttributes.addFlashAttribute("error", "Musisz wybrać jakąś opcję, aby zagłosować!");
+                return "redirect:/user/vote/" + id;
+            }
+
             votingService.castVote(user, id, option);
+            redirectAttributes.addFlashAttribute("success", "Głos oddany pomyślnie!");
+        } catch (IllegalStateException | IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("success", "Głos oddany pomyślnie!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
@@ -133,7 +160,7 @@ public class VotingController {
             redirectAttributes.addFlashAttribute("error", "Wyniki będą dostępne po zakończeniu głosowania!");
             return "redirect:/user/votes";
         }
-        
+
         Map<String, Integer> results = votingService.calculateResults(id);
 
         int totalVotes = results.values().stream().mapToInt(Integer::intValue).sum();
