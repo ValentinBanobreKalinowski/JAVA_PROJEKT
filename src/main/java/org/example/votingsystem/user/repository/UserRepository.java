@@ -10,5 +10,5 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User,Long> {
     List<User> findFirstByPesel(Long pesel);
     boolean existsByEmail(String email);
-    boolean existsByPesel(Long pesel);
+    boolean existsByPesel(String pesel);
 }

@@ -50,7 +50,7 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
-    public boolean existsByPesel(Long pesel) {
+    public boolean existsByPesel(String pesel) {
         return userRepository.existsByPesel(pesel);
     }
 }

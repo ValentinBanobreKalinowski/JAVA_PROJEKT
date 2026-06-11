@@ -62,58 +62,63 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Admin Registration</h2>
-        
-        <div class="warning">
-            WARNING: This page should be removed in production!
+<div class="container">
+    <h2>Admin Registration</h2>
+
+    <div class="warning">
+        WARNING: This page should be removed in production!
+    </div>
+
+    <form action="/register-admin" method="POST" th:object="${user}">
+
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" id="name" th:field="*{name}">
+            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error"></span>
         </div>
 
-        <form action="/register-admin" method="POST" th:object="${user}">
+        <div class="form-group">
+            <label for="surname">Surname:</label>
+            <input type="text" id="surname" th:field="*{surname}">
+            <span th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}" class="error"></span>
+        </div>
 
-            <div class="form-group">
-                <label for="name">Name:</label>
-                <input type="text" id="name" th:field="*{name}">
-                <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error"></span>
-            </div>
+        <div class="form-group">
+            <label for="pesel">PESEL:</label>
+            <input type="text" id="pesel" th:field="*{pesel}" maxlength="11">
+            <span th:if="${#fields.hasErrors('pesel')}" th:errors="*{pesel}" class="error"></span>
+        </div>
 
-            <div class="form-group">
-                <label for="surname">Surname:</label>
-                <input type="text" id="surname" th:field="*{surname}" >
-                <span th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}" class="error"></span>
-            </div>
+        <div class="form-group">
+            <label for="dateOfBirth">Date of Birth:</label>
+            <input type="date" id="dateOfBirth" th:field="*{dateOfBirth}">
+            <span th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}" class="error"></span>
+        </div>
 
-            <div class="form-group">
-                <label for="pesel">PESEL:</label>
-                <input type="number" id="pesel" th:field="*{pesel}">
-                <span th:if="${#fields.hasErrors('pesel')}" th:errors="*{pesel}" class="error"></span>
-            </div>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" th:field="*{email}">
+            <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error"></span>
+        </div>
 
-            <div class="form-group">
-                <label for="dateOfBirth">Date of Birth:</label>
-                <input type="date" id="dateOfBirth" th:field="*{dateOfBirth}">
-                <span th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}" class="error"></span>
-            </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" th:field="*{password}">
+            <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error"></span>
+        </div>
 
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" th:field="*{email}">
-                <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="error"></span>
-            </div>
+        <div class="form-group">
+            <label for="confirmPassword">Confirm Password:</label>
+            <input type="password" id="confirmPassword" th:field="*{confirmPassword}">
+            <span th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="error"></span>
+        </div>
 
+        <button type="submit">Register as Admin</button>
+    </form>
 
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" th:field="*{password}">
-                <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error"></span>
-            </div>
-
-            <button type="submit">Register as Admin</button>
-        </form>
-
-        <p style="text-align: center; margin-top: 20px;">
-            <a href="/login">Back to Login</a>
-        </p>
-    </div>
+    <p style="text-align: center; margin-top: 20px;">
+        <a href="/login">Back to Login</a>
+    </p>
+</div>
 </body>
 </html>

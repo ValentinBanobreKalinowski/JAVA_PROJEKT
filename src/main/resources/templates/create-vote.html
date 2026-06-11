@@ -98,86 +98,124 @@
             gap: 10px;
             margin-top: 30px;
         }
+        /* Nowe style dla błędów walidacji */
+        .error-message {
+            color: #dc3545;
+            font-size: 13px;
+            margin-top: 5px;
+            display: block;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Create New Vote</h1>
-        
-        <form action="/admin/create-vote" method="POST">
-            <div class="form-group">
-                <label for="title">Vote Title *</label>
-                <input type="text" id="title" name="title" required placeholder="Enter vote title">
-            </div>
+<div class="container">
+    <h1>Create New Vote</h1>
 
-            <div class="form-group">
-                <label for="description">Description</label>
-                <textarea id="description" name="description" placeholder="Enter vote description (optional)"></textarea>
-            </div>
+    <!-- Globalny błąd biznesowy (np. zła data z serwisu) -->
+    <div th:if="${businessError}" class="alert-danger" th:text="${businessError}"></div>
 
-            <div class="form-group">
-                <label for="startTime">Start Time *</label>
-                <input type="datetime-local" id="startTime" name="startTime" required>
-            </div>
+    <form th:action="@{/admin/create-vote}" method="POST" th:object="${votingForm}">
+        <div class="form-group">
+            <label for="title">Vote Title *</label>
+            <input type="text" id="title" th:field="*{title}" placeholder="Enter vote title">
+            <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="error-message"></span>
+        </div>
 
-            <div class="form-group">
-                <label for="endTime">End Time *</label>
-                <input type="datetime-local" id="endTime" name="endTime" required>
-            </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" th:field="*{description}" placeholder="Enter vote description (optional)"></textarea>
+        </div>
 
-            <div class="form-group">
-                <label for="type">Voting Type *</label>
-                <select id="type" name="type" required>
-                    <option value="SINGLE_CHOICE">Single Choice</option>
-                    <option value="MULTIPLE_CHOICE">Multiple Choice</option>
-                </select>
-            </div>
+        <div class="form-group">
+            <label for="startTime">Start Time *</label>
+            <input type="datetime-local" id="startTime" th:field="*{startTime}">
+            <span th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}" class="error-message"></span>
+        </div>
 
-            <div class="form-group">
-                <label>Vote Options *</label>
-                <div class="options-container" id="optionsContainer">
+        <div class="form-group">
+            <label for="endTime">End Time *</label>
+            <input type="datetime-local" id="endTime" th:field="*{endTime}">
+            <span th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}" class="error-message"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="type">Voting Type *</label>
+            <select id="type" th:field="*{type}">
+                <option value="SINGLE_CHOICE">Single Choice</option>
+                <option value="MULTIPLE_CHOICE">Multiple Choice</option>
+            </select>
+            <span th:if="${#fields.hasErrors('type')}" th:errors="*{type}" class="error-message"></span>
+        </div>
+
+        <div class="form-group">
+            <label>Vote Options *</label>
+            <div class="options-container" id="optionsContainer">
+
+                <!-- Odtwarzanie opcji w przypadku błędu walidacji (aby nie zniknęły) -->
+                <th:block th:if="${votingForm.options != null and !votingForm.options.isEmpty()}">
+                    <div class="option-item" th:each="opt : *{options}">
+                        <input type="text" name="options" th:value="${opt}" required>
+                        <button type="button" class="btn btn-danger" onclick="removeOption(this)">Remove</button>
+                    </div>
+                </th:block>
+
+                <!-- Domyślne 2 opcje, jeśli ładujemy formularz po raz pierwszy -->
+                <th:block th:if="${votingForm.options == null or votingForm.options.isEmpty()}">
                     <div class="option-item">
-                        <input type="text" name="options[]" placeholder="Option 1" required>
+                        <!-- Używamy name="options", Spring automatycznie zbierze to do List<String> -->
+                        <input type="text" name="options" placeholder="Option 1" required>
                         <button type="button" class="btn btn-danger" onclick="removeOption(this)">Remove</button>
                     </div>
                     <div class="option-item">
-                        <input type="text" name="options[]" placeholder="Option 2" required>
+                        <input type="text" name="options" placeholder="Option 2" required>
                         <button type="button" class="btn btn-danger" onclick="removeOption(this)">Remove</button>
                     </div>
-                </div>
-                <button type="button" class="btn btn-success" onclick="addOption()" style="margin-top: 10px;">Add Option</button>
+                </th:block>
             </div>
 
-            <div class="button-group">
-                <button type="submit" class="btn">Create Vote</button>
-                <a href="/admin/dashboard" class="btn btn-secondary">Cancel</a>
-            </div>
-        </form>
-    </div>
+            <!-- Błąd walidacji dla opcji (np. gdy podano mniej niż 2) -->
+            <span th:if="${#fields.hasErrors('options')}" th:errors="*{options}" class="error-message"></span>
 
-    <script>
-        let optionCount = 2;
+            <button type="button" class="btn btn-success" onclick="addOption()" style="margin-top: 10px;">Add Option</button>
+        </div>
 
-        function addOption() {
-            optionCount++;
-            const container = document.getElementById('optionsContainer');
-            const optionDiv = document.createElement('div');
-            optionDiv.className = 'option-item';
-            optionDiv.innerHTML = `
-                <input type="text" name="options[]" placeholder="Option ${optionCount}" required>
+        <div class="button-group">
+            <button type="submit" class="btn">Create Vote</button>
+            <a href="/admin/dashboard" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    function addOption() {
+        const container = document.getElementById('optionsContainer');
+        const optionCount = container.children.length + 1;
+        const optionDiv = document.createElement('div');
+        optionDiv.className = 'option-item';
+
+        optionDiv.innerHTML = `
+                <input type="text" name="options" placeholder="Option ${optionCount}" required>
                 <button type="button" class="btn btn-danger" onclick="removeOption(this)">Remove</button>
             `;
-            container.appendChild(optionDiv);
-        }
+        container.appendChild(optionDiv);
+    }
 
-        function removeOption(button) {
-            const container = document.getElementById('optionsContainer');
-            if (container.children.length > 2) {
-                button.parentElement.remove();
-            } else {
-                alert('You must have at least 2 options');
-            }
+    function removeOption(button) {
+        const container = document.getElementById('optionsContainer');
+        if (container.children.length > 2) {
+            button.parentElement.remove();
+        } else {
+            alert('You must have at least 2 options');
         }
-    </script>
+    }
+</script>
 </body>
 </html>

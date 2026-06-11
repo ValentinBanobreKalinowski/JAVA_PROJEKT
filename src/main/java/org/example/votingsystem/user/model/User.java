@@ -24,24 +24,24 @@ public class User implements UserDetails {
     @SequenceGenerator(name = "user_seq_gen", sequenceName = "users_seq", allocationSize = 1)
     private Long id;
 
-    @NotBlank(message = "Imię jest wymagane")
+    @NotBlank
     private String name;
-    @NotBlank(message = "Nazwisko jest wymagane")
+    @NotBlank
     private String surname;
-    @NotBlank(message = "Email jest wymagany")
-    @Email(message = "Podano niepoprawny format adresu email")
-    @Column(unique = true)
+    @NotBlank
+    @Email
+    @Column(unique = true, nullable = false)
     private String email;
-    @NotBlank(message = "Hasło jest wymagane")
-    @Size(min=8, message = "hasło musi mieć co najmniej 8 znaków")
+    @NotBlank
+    @Size
     private String password;
-    @Past(message = "data urodzenia musi być w przeszłości")
-    @NotNull(message = "data urodzenia jest wymagana")
+    @Past
+    @NotNull
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate dateOfBirth;
-    @NotNull(message = "PESEL jest wymagany")
+    @NotNull
     @Column(unique = true, nullable = false)
-    private Long pesel;
+    private String pesel;
     private String role = "ROLE_USER";
 
     public User modify(User newUserInfo) {
