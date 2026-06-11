@@ -31,6 +31,7 @@ public class Vote {
     private Integer voteWeight;
 
     private LocalDateTime castAt;
+
     public Long getId() {
         return id;
     }
