@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Vote Results - Voting System</title>
+    <title>Wyniki Głosowania - System Głosowania</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -123,24 +123,24 @@
         <p class="description" th:text="${voting.description}"></p>
 
         <div class="vote-info">
-            <strong>Voting Period:</strong><br>
-            From: <span th:text="${#temporals.format(voting.startTime, 'yyyy-MM-dd HH:mm')}"></span><br>
-            To: <span th:text="${#temporals.format(voting.endTime, 'yyyy-MM-dd HH:mm')}"></span>
+            <strong>Okres głosowania:</strong><br>
+            Od: <span th:text="${#temporals.format(voting.startTime, 'yyyy-MM-dd HH:mm')}"></span><br>
+            Do: <span th:text="${#temporals.format(voting.endTime, 'yyyy-MM-dd HH:mm')}"></span>
         </div>
 
         <div th:if="${isActive}" class="status-badge status-active">
-            Voting in Progress
+            Głosowanie w toku
         </div>
         <div th:if="${!isActive}" class="status-badge status-ended">
-            Voting Ended
+            Głosowanie zakończone
         </div>
 
-        <h2>Results:</h2>
+        <h2>Wyniki:</h2>
         <div class="results-container">
             <div th:each="entry : ${results}" class="result-item">
                 <div class="result-label">
                     <span th:text="${entry.key}"></span>
-                    <span th:text="${entry.value} + ' votes'"></span>
+                    <span th:text="${entry.value} + ' głosów'"></span>
                 </div>
                 <div class="result-bar-container">
                     <div class="result-bar" 
@@ -153,13 +153,13 @@
         </div>
 
         <div class="total-votes">
-            Total Votes Cast: <span th:text="${totalVotes}"></span>
+            Łączna liczba głosów: <span th:text="${totalVotes}"></span>
         </div>
 
         <div class="button-group">
-            <a th:if="${isAdmin}" href="/admin/dashboard" class="btn">Back to Dashboard</a>
-            <a th:if="${!isAdmin}" href="/user/votes" class="btn">Back to Votes</a>
-            <button onclick="window.print()" class="btn btn-secondary">Print Results</button>
+            <a th:if="${isAdmin}" href="/admin/dashboard" class="btn">Powrót do Panelu</a>
+            <a th:if="${!isAdmin}" href="/user/votes" class="btn">Powrót do Głosowań</a>
+            <button onclick="window.print()" class="btn btn-secondary">Drukuj Wyniki</button>
         </div>
     </div>
 </body>

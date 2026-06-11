@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Voting History - Voting System</title>
+    <title>Historia Głosowań - System Głosowania</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -114,32 +114,32 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Voting History</h1>
-            <a href="/logout" class="btn btn-secondary">Logout</a>
+            <h1>Historia Głosowań</h1>
+            <a href="/logout" class="btn btn-secondary">Wyloguj</a>
         </div>
 
         <div class="nav-links">
-            <a href="/user/votes">Active Votes</a>
-            <a href="/user/history" class="active">History</a>
+            <a href="/user/votes">Aktywne Głosowania</a>
+            <a href="/user/history" class="active">Historia</a>
         </div>
 
         <div th:if="${#lists.isEmpty(votings)}" class="no-votes">
-            <h2>No completed votes yet</h2>
-            <p>Check back later to see results of finished votes</p>
+            <h2>Brak zakończonych głosowań</h2>
+            <p>Sprawdź ponownie później, aby zobaczyć wyniki zakończonych głosowań</p>
         </div>
 
         <div th:each="voting : ${votings}" class="vote-card">
             <h3 th:text="${voting.title}"></h3>
-            <span class="status-badge">Ended</span>
-            <span th:if="${voting.hasVoted}" class="voted-badge">You voted</span>
+            <span class="status-badge">Zakończone</span>
+            <span th:if="${voting.hasVoted}" class="voted-badge">Głosowałeś</span>
             <p th:text="${voting.description}"></p>
             <div class="vote-info">
-                <strong>Started:</strong> <span th:text="${#temporals.format(voting.startTime, 'yyyy-MM-dd HH:mm')}"></span><br>
-                <strong>Ended:</strong> <span th:text="${#temporals.format(voting.endTime, 'yyyy-MM-dd HH:mm')}"></span><br>
-                <strong>Type:</strong> <span th:text="${voting.type}"></span>
+                <strong>Rozpoczęte:</strong> <span th:text="${#temporals.format(voting.startTime, 'yyyy-MM-dd HH:mm')}"></span><br>
+                <strong>Zakończone:</strong> <span th:text="${#temporals.format(voting.endTime, 'yyyy-MM-dd HH:mm')}"></span><br>
+                <strong>Typ:</strong> <span th:text="${voting.type}"></span>
             </div>
             <div class="vote-actions">
-                <a th:href="@{/user/results/{id}(id=${voting.id})}" class="btn">View Results</a>
+                <a th:href="@{/user/results/{id}(id=${voting.id})}" class="btn">Zobacz Wyniki</a>
             </div>
         </div>
     </div>

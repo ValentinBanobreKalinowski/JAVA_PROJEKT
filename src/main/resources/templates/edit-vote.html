@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Utwórz Głosowanie - System Głosowania</title>
+    <title>Edytuj Głosowanie - System Głosowania</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -102,46 +102,42 @@
 </head>
 <body>
     <div class="container">
-        <h1>Utwórz Nowe Głosowanie</h1>
+        <h1>Edytuj Głosowanie</h1>
 
-        <form action="/admin/create-vote" method="POST">
+        <form th:action="@{/admin/edit-vote/{id}(id=${voting.id})}" method="POST">
             <div class="form-group">
                 <label for="title">Tytuł Głosowania *</label>
-                <input type="text" id="title" name="title" required placeholder="Wprowadź tytuł głosowania">
+                <input type="text" id="title" name="title" th:value="${voting.title}" required placeholder="Wprowadź tytuł głosowania">
             </div>
 
             <div class="form-group">
                 <label for="description">Opis</label>
-                <textarea id="description" name="description" placeholder="Wprowadź opis głosowania (opcjonalnie)"></textarea>
+                <textarea id="description" name="description" th:text="${voting.description}" placeholder="Wprowadź opis głosowania (opcjonalnie)"></textarea>
             </div>
 
             <div class="form-group">
                 <label for="startTime">Czas Rozpoczęcia *</label>
-                <input type="datetime-local" id="startTime" name="startTime" required>
+                <input type="datetime-local" id="startTime" name="startTime" th:value="${#temporals.format(voting.startTime, 'yyyy-MM-dd''T''HH:mm')}" required>
             </div>
 
             <div class="form-group">
                 <label for="endTime">Czas Zakończenia *</label>
-                <input type="datetime-local" id="endTime" name="endTime" required>
+                <input type="datetime-local" id="endTime" name="endTime" th:value="${#temporals.format(voting.endTime, 'yyyy-MM-dd''T''HH:mm')}" required>
             </div>
 
             <div class="form-group">
                 <label for="type">Typ Głosowania *</label>
                 <select id="type" name="type" required>
-                    <option value="SINGLE_CHOICE">Jednokrotny wybór</option>
-                    <option value="MULTIPLE_CHOICE">Wielokrotny wybór</option>
+                    <option value="SINGLE_CHOICE" th:selected="${voting.type.name() == 'SINGLE_CHOICE'}">Jednokrotny wybór</option>
+                    <option value="MULTIPLE_CHOICE" th:selected="${voting.type.name() == 'MULTIPLE_CHOICE'}">Wielokrotny wybór</option>
                 </select>
             </div>
 
             <div class="form-group">
                 <label>Opcje Głosowania *</label>
                 <div class="options-container" id="optionsContainer">
-                    <div class="option-item">
-                        <input type="text" name="options[]" placeholder="Opcja 1" required>
-                        <button type="button" class="btn btn-danger" onclick="removeOption(this)">Usuń</button>
-                    </div>
-                    <div class="option-item">
-                        <input type="text" name="options[]" placeholder="Opcja 2" required>
+                    <div class="option-item" th:each="option, iterStat : ${voting.options}">
+                        <input type="text" name="options[]" th:value="${option}" th:placeholder="'Opcja ' + ${iterStat.count}" required>
                         <button type="button" class="btn btn-danger" onclick="removeOption(this)">Usuń</button>
                     </div>
                 </div>
@@ -149,14 +145,14 @@
             </div>
 
             <div class="button-group">
-                <button type="submit" class="btn">Utwórz Głosowanie</button>
+                <button type="submit" class="btn">Zaktualizuj Głosowanie</button>
                 <a href="/admin/dashboard" class="btn btn-secondary">Anuluj</a>
             </div>
         </form>
     </div>
 
-    <script>
-        let optionCount = 2;
+    <script th:inline="javascript">
+        let optionCount = /*[[${voting.options.size()}]]*/ 2;
 
         function addOption() {
             optionCount++;

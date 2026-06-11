@@ -56,7 +56,7 @@ public class VotingController {
         voting.setOptions(options);
 
         votingService.createVoting(voting);
-        redirectAttributes.addFlashAttribute("success", "Vote created successfully!");
+        redirectAttributes.addFlashAttribute("success", "Głosowanie utworzone pomyślnie!");
         return "redirect:/admin/dashboard";
     }
 
@@ -64,7 +64,7 @@ public class VotingController {
     @PreAuthorize("hasRole('ADMIN')")
     public String finishVote(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         votingService.finishVote(id);
-        redirectAttributes.addFlashAttribute("success", "Vote finished successfully!");
+        redirectAttributes.addFlashAttribute("success", "Głosowanie zakończone pomyślnie!");
         return "redirect:/admin/dashboard";
     }
 
@@ -99,7 +99,7 @@ public class VotingController {
     @PreAuthorize("hasRole('USER')")
     public String castVoteForm(@PathVariable Long id, @AuthenticationPrincipal User user, Model model, RedirectAttributes redirectAttributes) {
         if (votingService.hasUserVoted(user.getId(), id)) {
-            redirectAttributes.addFlashAttribute("error", "You have already voted!");
+            redirectAttributes.addFlashAttribute("error", "Już zagłosowałeś!");
             return "redirect:/user/votes";
         }
 
@@ -118,7 +118,7 @@ public class VotingController {
         try {
             String option = chosenOption != null ? chosenOption : String.join(",", chosenOptions);
             votingService.castVote(user, id, option);
-            redirectAttributes.addFlashAttribute("success", "Vote cast successfully!");
+            redirectAttributes.addFlashAttribute("success", "Głos oddany pomyślnie!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
@@ -128,9 +128,9 @@ public class VotingController {
     @GetMapping("/user/results/{id}")
     public String userViewResults(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         Voting voting = votingService.getVotingById(id);
-        
+
         if (voting.getEndTime().isAfter(LocalDateTime.now())) {
-            redirectAttributes.addFlashAttribute("error", "Results are not available until voting ends!");
+            redirectAttributes.addFlashAttribute("error", "Wyniki będą dostępne po zakończeniu głosowania!");
             return "redirect:/user/votes";
         }
         
@@ -155,5 +155,46 @@ public class VotingController {
         endedVotings.forEach(v -> v.setHasVoted(votingService.hasUserVoted(user.getId(), v.getId())));
         model.addAttribute("votings", endedVotings);
         return "voting-history";
+    }
+
+    @GetMapping("/admin/edit-vote/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String editVoteForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        Voting voting = votingService.getVotingById(id);
+
+        if (!votingService.canEditVoting(id)) {
+            redirectAttributes.addFlashAttribute("error", "Nie można edytować głosowania, które już się rozpoczęło lub zakończyło.");
+            return "redirect:/admin/dashboard";
+        }
+
+        model.addAttribute("voting", voting);
+        return "edit-vote";
+    }
+
+    @PostMapping("/admin/edit-vote/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String editVote(@PathVariable Long id,
+                          @RequestParam String title,
+                          @RequestParam(required = false) String description,
+                          @RequestParam String startTime,
+                          @RequestParam String endTime,
+                          @RequestParam VotingType type,
+                          @RequestParam("options[]") List<String> options,
+                          RedirectAttributes redirectAttributes) {
+        try {
+            Voting updatedVoting = new Voting();
+            updatedVoting.setTitle(title);
+            updatedVoting.setDescription(description);
+            updatedVoting.setStartTime(LocalDateTime.parse(startTime));
+            updatedVoting.setEndTime(LocalDateTime.parse(endTime));
+            updatedVoting.setType(type);
+            updatedVoting.setOptions(options);
+
+            votingService.updateVoting(id, updatedVoting);
+            redirectAttributes.addFlashAttribute("success", "Głosowanie zaktualizowane pomyślnie!");
+        } catch (IllegalStateException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin/dashboard";
     }
 }

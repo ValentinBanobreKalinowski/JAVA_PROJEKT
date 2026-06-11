@@ -78,7 +78,6 @@ public class User implements UserDetails {
     public boolean isEnabled() { return true; }
 
     public Integer getVoteWeight() {
-        // Default vote weight is 1, can be customized based on user attributes
         return 1;
     }
 }
