@@ -21,7 +21,7 @@ public class UserLoginController {
     @GetMapping("/register")
     public String registration(Model model) {
         model.addAttribute("user", new UserRegistrationDto());
-        return "welcome";
+        return "register-user";
     }
 
     @GetMapping("/users/dashboard")
@@ -44,7 +44,7 @@ public class UserLoginController {
         }
 
         if (bindingResult.hasErrors()) {
-            return "welcome";
+            return "register-user";
         }
 
         User newUser = new User();
@@ -55,7 +55,6 @@ public class UserLoginController {
         newUser.setDateOfBirth(registrationDto.getDateOfBirth());
         newUser.setPesel(registrationDto.getPesel());
         newUser.setRole("ROLE_USER");
-
         userService.addUser(newUser);
         return "redirect:/login";
     }

@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Create Vote - Voting System</title>
+    <title>Utwórz Głosowanie - System Głosowania</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -98,7 +98,6 @@
             gap: 10px;
             margin-top: 30px;
         }
-        /* Nowe style dla błędów walidacji */
         .error-message {
             color: #dc3545;
             font-size: 13px;
@@ -117,14 +116,13 @@
 </head>
 <body>
 <div class="container">
-    <h1>Create New Vote</h1>
+    <h1>Utwórz Nowe Głosowanie</h1>
 
-    <!-- Globalny błąd biznesowy (np. zła data z serwisu) -->
     <div th:if="${businessError}" class="alert-danger" th:text="${businessError}"></div>
 
     <form th:action="@{/admin/create-vote}" method="POST" th:object="${votingForm}">
         <div class="form-group">
-            <label for="title">Vote Title *</label>
+            <label for="title">Tytuł Głosowania *</label>
             <input type="text" id="title" th:field="*{title}" placeholder="Enter vote title">
             <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="error-message"></span>
         </div>
@@ -135,31 +133,30 @@
         </div>
 
         <div class="form-group">
-            <label for="startTime">Start Time *</label>
+            <label for="startTime">Czas Rozpoczęcia *</label>
             <input type="datetime-local" id="startTime" th:field="*{startTime}">
             <span th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}" class="error-message"></span>
         </div>
 
         <div class="form-group">
-            <label for="endTime">End Time *</label>
+            <label for="endTime">Czas Zakończenia *</label>
             <input type="datetime-local" id="endTime" th:field="*{endTime}">
             <span th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}" class="error-message"></span>
         </div>
 
         <div class="form-group">
-            <label for="type">Voting Type *</label>
+            <label for="type">Typ Głosowania *</label>
             <select id="type" th:field="*{type}">
-                <option value="SINGLE_CHOICE">Single Choice</option>
-                <option value="MULTIPLE_CHOICE">Multiple Choice</option>
+                <option value="SINGLE_CHOICE">Jednokrotny wybór</option>
+                <option value="MULTIPLE_CHOICE">Wielokrotny Wybór</option>
             </select>
             <span th:if="${#fields.hasErrors('type')}" th:errors="*{type}" class="error-message"></span>
         </div>
 
         <div class="form-group">
-            <label>Vote Options *</label>
+            <label>Opcje Głosowania *</label>
             <div class="options-container" id="optionsContainer">
 
-                <!-- Odtwarzanie opcji w przypadku błędu walidacji (aby nie zniknęły) -->
                 <th:block th:if="${votingForm.options != null and !votingForm.options.isEmpty()}">
                     <div class="option-item" th:each="opt : *{options}">
                         <input type="text" name="options" th:value="${opt}" required>
@@ -167,34 +164,32 @@
                     </div>
                 </th:block>
 
-                <!-- Domyślne 2 opcje, jeśli ładujemy formularz po raz pierwszy -->
                 <th:block th:if="${votingForm.options == null or votingForm.options.isEmpty()}">
                     <div class="option-item">
-                        <!-- Używamy name="options", Spring automatycznie zbierze to do List<String> -->
-                        <input type="text" name="options" placeholder="Option 1" required>
-                        <button type="button" class="btn btn-danger" onclick="removeOption(this)">Remove</button>
+                        <input type="text" name="options" placeholder="Opcja 1" required>
+                        <button type="button" class="btn btn-danger" onclick="removeOption(this)">Usuń</button>
                     </div>
                     <div class="option-item">
-                        <input type="text" name="options" placeholder="Option 2" required>
-                        <button type="button" class="btn btn-danger" onclick="removeOption(this)">Remove</button>
+                        <input type="text" name="options" placeholder="Opcja 2" required>
+                        <button type="button" class="btn btn-danger" onclick="removeOption(this)">Usuń</button>
                     </div>
                 </th:block>
             </div>
 
-            <!-- Błąd walidacji dla opcji (np. gdy podano mniej niż 2) -->
             <span th:if="${#fields.hasErrors('options')}" th:errors="*{options}" class="error-message"></span>
 
-            <button type="button" class="btn btn-success" onclick="addOption()" style="margin-top: 10px;">Add Option</button>
+            <button type="button" class="btn btn-success" onclick="addOption()" style="margin-top: 10px;">Dodaj Opcję</button>
         </div>
 
         <div class="button-group">
-            <button type="submit" class="btn">Create Vote</button>
-            <a href="/admin/dashboard" class="btn btn-secondary">Cancel</a>
+            <button type="submit" class="btn">Utwórz Głosowanie</button>
+            <a href="/admin/dashboard" class="btn btn-secondary">Anuluj</a>
         </div>
     </form>
 </div>
 
 <script>
+
     function addOption() {
         const container = document.getElementById('optionsContainer');
         const optionCount = container.children.length + 1;
@@ -213,7 +208,7 @@
         if (container.children.length > 2) {
             button.parentElement.remove();
         } else {
-            alert('You must have at least 2 options');
+            alert('Musisz mieć co najmniej 2 Opcje');
         }
     }
 </script>

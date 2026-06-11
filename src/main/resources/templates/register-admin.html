@@ -63,22 +63,22 @@
 </head>
 <body>
 <div class="container">
-    <h2>Admin Registration</h2>
+    <h2>Rejestracja Administratora</h2>
 
     <div class="warning">
-        WARNING: This page should be removed in production!
+        Usunąć stronke na produkcji
     </div>
 
     <form action="/register-admin" method="POST" th:object="${user}">
 
         <div class="form-group">
-            <label for="name">Name:</label>
+            <label for="name">Imie:</label>
             <input type="text" id="name" th:field="*{name}">
             <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="error"></span>
         </div>
 
         <div class="form-group">
-            <label for="surname">Surname:</label>
+            <label for="surname">Nazwisko:</label>
             <input type="text" id="surname" th:field="*{surname}">
             <span th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}" class="error"></span>
         </div>
@@ -90,7 +90,7 @@
         </div>
 
         <div class="form-group">
-            <label for="dateOfBirth">Date of Birth:</label>
+            <label for="dateOfBirth">Data Urodzenia:</label>
             <input type="date" id="dateOfBirth" th:field="*{dateOfBirth}">
             <span th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}" class="error"></span>
         </div>
@@ -102,22 +102,22 @@
         </div>
 
         <div class="form-group">
-            <label for="password">Password:</label>
+            <label for="password">Hasło:</label>
             <input type="password" id="password" th:field="*{password}">
             <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="error"></span>
         </div>
 
         <div class="form-group">
-            <label for="confirmPassword">Confirm Password:</label>
+            <label for="confirmPassword">Potwierdź hasło</label>
             <input type="password" id="confirmPassword" th:field="*{confirmPassword}">
             <span th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="error"></span>
         </div>
 
-        <button type="submit">Register as Admin</button>
+        <button type="submit">Zarejestruj Administratora</button>
     </form>
 
     <p style="text-align: center; margin-top: 20px;">
-        <a href="/login">Back to Login</a>
+        <a href="/login">Wróć do logowania</a>
     </p>
 </div>
 </body>

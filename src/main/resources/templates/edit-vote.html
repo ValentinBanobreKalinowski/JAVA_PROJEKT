@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edytuj Głosowanie - System Głosowania</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"],
+        input[type="datetime-local"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .options-container {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .option-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .option-item input {
+            flex: 1;
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .btn-success {
+            background-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            font-size: 12px;
+            padding: 5px 10px;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Edytuj Głosowanie</h1>
+
+        <form th:action="@{/admin/edit-vote/{id}(id=${voting.id})}" method="POST">
+            <div class="form-group">
+                <label for="title">Tytuł Głosowania *</label>
+                <input type="text" id="title" name="title" th:value="${voting.title}" required placeholder="Wprowadź tytuł głosowania">
+            </div>
+
+            <div class="form-group">
+                <label for="description">Opis</label>
+                <textarea id="description" name="description" th:text="${voting.description}" placeholder="Wprowadź opis głosowania (opcjonalnie)"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="startTime">Czas Rozpoczęcia *</label>
+                <input type="datetime-local" id="startTime" name="startTime" th:value="${#temporals.format(voting.startTime, 'yyyy-MM-dd''T''HH:mm')}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="endTime">Czas Zakończenia *</label>
+                <input type="datetime-local" id="endTime" name="endTime" th:value="${#temporals.format(voting.endTime, 'yyyy-MM-dd''T''HH:mm')}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="type">Typ Głosowania *</label>
+                <select id="type" name="type" required>
+                    <option value="SINGLE_CHOICE" th:selected="${voting.type.name() == 'SINGLE_CHOICE'}">Jednokrotny wybór</option>
+                    <option value="MULTIPLE_CHOICE" th:selected="${voting.type.name() == 'MULTIPLE_CHOICE'}">Wielokrotny wybór</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Opcje Głosowania *</label>
+                <div class="options-container" id="optionsContainer">
+                    <div class="option-item" th:each="option, iterStat : ${voting.options}">
+                        <input type="text" name="options[]" th:value="${option}" th:placeholder="'Opcja ' + ${iterStat.count}" required>
+                        <button type="button" class="btn btn-danger" onclick="removeOption(this)">Usuń</button>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-success" onclick="addOption()" style="margin-top: 10px;">Dodaj Opcję</button>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="btn">Zaktualizuj Głosowanie</button>
+                <a href="/admin/dashboard" class="btn btn-secondary">Anuluj</a>
+            </div>
+        </form>
+    </div>
+
+    <script th:inline="javascript">
+        let optionCount = /*[[${voting.options.size()}]]*/ 2;
+
+        function addOption() {
+            optionCount++;
+            const container = document.getElementById('optionsContainer');
+            const optionDiv = document.createElement('div');
+            optionDiv.className = 'option-item';
+            optionDiv.innerHTML = `
+                <input type="text" name="options[]" placeholder="Opcja ${optionCount}" required>
+                <button type="button" class="btn btn-danger" onclick="removeOption(this)">Usuń</button>
+            `;
+            container.appendChild(optionDiv);
+        }
+
+        function removeOption(button) {
+            const container = document.getElementById('optionsContainer');
+            if (container.children.length > 2) {
+                button.parentElement.remove();
+            } else {
+                alert('Musisz mieć co najmniej 2 opcje');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Dashboard - Voting System</title>
+    <title>Panel Administratora - System Głosowania</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -102,26 +102,26 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Admin Dashboard</h1>
+            <h1>Panel Administratora</h1>
             <div>
-                <a href="/logout" class="btn btn-secondary">Logout</a>
+                <a href="/logout" class="btn btn-secondary">Wyloguj</a>
             </div>
         </div>
 
         <div style="margin-bottom: 20px;">
-            <a href="/admin/create-vote" class="btn btn-success">Create New Vote</a>
+            <a href="/admin/create-vote" class="btn btn-success">Utwórz Nowe Głosowanie</a>
         </div>
 
-        <h2>All Votes</h2>
+        <h2>Wszystkie Głosowania</h2>
         <table>
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Title</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
+                    <th>Tytuł</th>
+                    <th>Początek</th>
+                    <th>Koniec</th>
                     <th>Status</th>
-                    <th>Actions</th>
+                    <th>Akcje</th>
                 </tr>
             </thead>
             <tbody>
@@ -131,15 +131,16 @@
                     <td th:text="${#temporals.format(voting.startTime, 'yyyy-MM-dd HH:mm')}"></td>
                     <td th:text="${#temporals.format(voting.endTime, 'yyyy-MM-dd HH:mm')}"></td>
                     <td>
-                        <span th:if="${voting.status == 'ACTIVE'}" class="status status-active">Active</span>
-                        <span th:if="${voting.status == 'UPCOMING'}" class="status status-upcoming">Upcoming</span>
-                        <span th:if="${voting.status == 'ENDED'}" class="status status-ended">Ended</span>
+                        <span th:if="${voting.status == 'ACTIVE'}" class="status status-active">Aktywne</span>
+                        <span th:if="${voting.status == 'UPCOMING'}" class="status status-upcoming">Nadchodzące</span>
+                        <span th:if="${voting.status == 'ENDED'}" class="status status-ended">Zakończone</span>
                     </td>
                     <td>
                         <div class="action-buttons">
-                            <a th:href="@{/admin/vote-results/{id}(id=${voting.id})}" class="btn">View Results</a>
+                            <a th:href="@{/admin/vote-results/{id}(id=${voting.id})}" class="btn">Zobacz Wyniki</a>
+                            <a th:if="${voting.status == 'UPCOMING'}" th:href="@{/admin/edit-vote/{id}(id=${voting.id})}" class="btn btn-success">Edytuj</a>
                             <form th:if="${voting.status == 'ACTIVE'}" th:action="@{/admin/finish-vote/{id}(id=${voting.id})}" method="post" style="display: inline;">
-                                <button type="submit" class="btn btn-danger">Finish Vote</button>
+                                <button type="submit" class="btn btn-danger">Zakończ Głosowanie</button>
                             </form>
                         </div>
                     </td>
