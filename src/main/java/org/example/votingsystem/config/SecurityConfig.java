@@ -21,9 +21,11 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/users/dashboard").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/admin/manage-users", "/admin/change-role/**", "/admin/delete-user/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/**").hasAnyRole("ADMIN", "MODERATOR")
+                        .requestMatchers("/moderator/**").hasRole("MODERATOR")
+                        .requestMatchers("/user/**").hasRole("USER")
+                        .requestMatchers("/users/dashboard").hasAnyRole("USER", "ADMIN", "MODERATOR")
                         .requestMatchers("/login", "/register", "/register-admin").permitAll()
                         .requestMatchers("/users", "/users/login").permitAll()
                         .anyRequest().authenticated()
@@ -35,6 +37,9 @@ public class SecurityConfig {
                             if (authentication.getAuthorities().stream()
                                     .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
                                 response.sendRedirect("/admin/dashboard");
+                            } else if (authentication.getAuthorities().stream()
+                                    .anyMatch(a -> a.getAuthority().equals("ROLE_MODERATOR"))) {
+                                response.sendRedirect("/moderator/dashboard");
                             } else {
                                 response.sendRedirect("/user/votes");
                             }

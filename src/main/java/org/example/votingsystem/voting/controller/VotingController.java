@@ -5,6 +5,7 @@ import org.example.votingsystem.voting.dto.VotingCreateDto;
 import org.example.votingsystem.voting.model.*;
 import org.example.votingsystem.voting.services.VotingService;
 import org.example.votingsystem.user.model.User;
+import org.example.votingsystem.user.services.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -21,9 +22,11 @@ import java.util.Map;
 public class VotingController {
 
     private final VotingService votingService;
+    private final UserService userService;
 
-    public VotingController(VotingService votingService) {
+    public VotingController(VotingService votingService, UserService userService) {
         this.votingService = votingService;
+        this.userService = userService;
     }
 
     @GetMapping("/admin/dashboard")
@@ -35,14 +38,14 @@ public class VotingController {
     }
 
     @GetMapping("/admin/create-vote")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
     public String createVoteForm(Model model) {
         model.addAttribute("votingForm", new VotingCreateDto());
         return "create-vote";
     }
 
     @PostMapping("/admin/create-vote")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
     public String createVote(@Valid @ModelAttribute("votingForm") VotingCreateDto dto,
                              BindingResult bindingResult,
                              Model model,
@@ -79,17 +82,28 @@ public class VotingController {
         }
     }
 
+    @GetMapping("/moderator/dashboard")
+    @PreAuthorize("hasRole('MODERATOR')")
+    public String moderatorDashboard(Model model) {
+        List<Voting> votings = votingService.getAllVotings();
+        model.addAttribute("votings", votings);
+        return "moderator-dashboard";
+    }
+
     @PostMapping("/admin/finish-vote/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String finishVote(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
+    public String finishVote(@PathVariable Long id, RedirectAttributes redirectAttributes, @AuthenticationPrincipal User user) {
         votingService.finishVote(id);
         redirectAttributes.addFlashAttribute("success", "Głosowanie zakończone pomyślnie!");
+        if (user.getRole().equals("ROLE_MODERATOR")) {
+            return "redirect:/moderator/dashboard";
+        }
         return "redirect:/admin/dashboard";
     }
 
     @GetMapping("/admin/vote-results/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String adminViewResults(@PathVariable Long id, Model model) {
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
+    public String adminViewResults(@PathVariable Long id, Model model, @AuthenticationPrincipal User user) {
         Voting voting = votingService.getVotingById(id);
         Map<String, Integer> results = votingService.calculateResults(id);
 
@@ -101,7 +115,7 @@ public class VotingController {
         model.addAttribute("totalVotes", totalVotes);
         model.addAttribute("maxVotes", maxVotes);
         model.addAttribute("isActive", voting.getEndTime().isAfter(LocalDateTime.now()));
-        model.addAttribute("isAdmin", true);
+        model.addAttribute("isAdmin", user.getRole().equals("ROLE_ADMIN") || user.getRole().equals("ROLE_MODERATOR"));
         return "vote-results";
     }
 
@@ -185,12 +199,15 @@ public class VotingController {
     }
 
     @GetMapping("/admin/edit-vote/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String editVoteForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
+    public String editVoteForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes, @AuthenticationPrincipal User user) {
         Voting voting = votingService.getVotingById(id);
 
         if (!votingService.canEditVoting(id)) {
             redirectAttributes.addFlashAttribute("error", "Nie można edytować głosowania, które już się rozpoczęło lub zakończyło.");
+            if (user.getRole().equals("ROLE_MODERATOR")) {
+                return "redirect:/moderator/dashboard";
+            }
             return "redirect:/admin/dashboard";
         }
 
@@ -199,7 +216,7 @@ public class VotingController {
     }
 
     @PostMapping("/admin/edit-vote/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MODERATOR')")
     public String editVote(@PathVariable Long id,
                           @RequestParam String title,
                           @RequestParam(required = false) String description,
@@ -207,7 +224,8 @@ public class VotingController {
                           @RequestParam String endTime,
                           @RequestParam VotingType type,
                           @RequestParam("options[]") List<String> options,
-                          RedirectAttributes redirectAttributes) {
+                          RedirectAttributes redirectAttributes,
+                          @AuthenticationPrincipal User user) {
         try {
             Voting updatedVoting = new Voting();
             updatedVoting.setTitle(title);
@@ -222,6 +240,63 @@ public class VotingController {
         } catch (IllegalStateException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
+        if (user.getRole().equals("ROLE_MODERATOR")) {
+            return "redirect:/moderator/dashboard";
+        }
         return "redirect:/admin/dashboard";
+    }
+
+    @GetMapping("/admin/manage-users")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String manageUsers(@RequestParam(required = false) String search,
+                             @RequestParam(required = false) String name,
+                             @RequestParam(required = false) String surname,
+                             @RequestParam(required = false) Integer minAge,
+                             @RequestParam(required = false) Integer maxAge,
+                             Model model) {
+        List<User> users;
+
+        if (search != null && !search.trim().isEmpty()) {
+            users = userService.searchUsers(search);
+        } else if (name != null || surname != null || minAge != null || maxAge != null) {
+            users = userService.filterUsers(name, surname, minAge, maxAge);
+        } else {
+            users = userService.getUsers();
+        }
+
+        model.addAttribute("users", users);
+        model.addAttribute("userService", userService);
+        model.addAttribute("search", search);
+        model.addAttribute("name", name);
+        model.addAttribute("surname", surname);
+        model.addAttribute("minAge", minAge);
+        model.addAttribute("maxAge", maxAge);
+        return "manage-users";
+    }
+
+    @PostMapping("/admin/change-role/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String changeUserRole(@PathVariable Long id,
+                                @RequestParam String role,
+                                RedirectAttributes redirectAttributes) {
+        try {
+            userService.changeUserRole(id, role);
+            redirectAttributes.addFlashAttribute("success", "Rola użytkownika została zmieniona!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Błąd podczas zmiany roli: " + e.getMessage());
+        }
+        return "redirect:/admin/manage-users";
+    }
+
+    @PostMapping("/admin/delete-user/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            userService.deleteUser(id);
+            redirectAttributes.addFlashAttribute("success", "Użytkownik został usunięty!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Błąd podczas usuwania użytkownika: " + e.getMessage());
+        }
+        return "redirect:/admin/manage-users";
     }
 }
